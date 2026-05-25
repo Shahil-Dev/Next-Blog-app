@@ -11,3 +11,158 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+// User Roles Enum
+enum Role {
+  USER
+  MODERATOR
+  ADMIN
+  SUPER_ADMIN
+}
+
+// Friend Request Status Enum
+enum RequestStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
+
+// Multi-Reaction Enum
+enum ReactionType {
+  LOVE
+  HAHA
+  SAD
+  ANGRY
+}
+
+// Comment Status Enum
+enum CommentStatus {
+  APPROVED
+  FLAGGED
+  REJECTED
+}
+
+// 1. User Model (Integrated with Better-Auth fields)
+// model User {
+//   id            String          @id @default(uuid())
+//   name          String
+//   email         String          @unique
+//   emailVerified Boolean         @default(false)
+//   image         String?         // Profile picture
+//   coverImage    String?         // Cover Photo
+//   bio           String?
+//   role          Role            @default(USER)
+//   createdAt     DateTime        @default(now())
+//   updatedAt     DateTime        @updatedAt
+
+//   // Relations
+//   posts         Post[]
+//   comments      Comment[]
+//   reactions     Reaction[]
+  
+//   // Friend Request Relations (Self-relation)
+//   sentRequests     FriendRequest[] @relation("SentRequests")
+//   receivedRequests FriendRequest[] @relation("ReceivedRequests")
+
+//   // Sessions (Better-Auth required)
+//   sessions      Session[]
+//   accounts      Account[]
+// }
+
+// Better-Auth Core Models
+// model Session {
+//   id        String   @id @default(uuid())
+//   userId    String
+//   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+//   token     String   @unique
+//   expiresAt DateTime
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
+// }
+
+model Account {
+  id                    String   @id @default(uuid())
+  userId                String
+  // user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  providerId            String
+  accountId             String
+  providerAccountId     String
+  accessToken           String?
+  refreshToken          String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+}
+
+// 2. Friend Request Model (Handles complete friendship logic)
+model FriendRequest {
+  id          String        @id @default(uuid())
+  senderId    String
+  // sender      User          @relation("SentRequests", fields: [senderId], references: [id], onDelete: Cascade)
+  receiverId  String
+  // receiver    User          @relation("ReceivedRequests", fields: [receiverId], references: [id], onDelete: Cascade)
+  status      RequestStatus @default(PENDING)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@unique([senderId, receiverId]) // Prevents duplicate entries between same users
+  @@index([senderId, receiverId, status])
+}
+
+// 3. Post Model (With support for multimedia and tracking interactions)
+model Post {
+  id        String     @id @default(uuid())
+  content   String     @db.Text
+  mediaUrl  String?    // URL for uploaded images/videos
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  authorId  String
+  // author    User       @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  
+  // Relations
+  comments  Comment[]
+  reactions Reaction[]
+
+  @@index([authorId, createdAt ])
+}
+
+// 4. Advanced Reactions Model (Idempotent tracking for posts/comments)
+model Reaction {
+  id        String       @id @default(uuid())
+  type      ReactionType
+  userId    String
+  // user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  postId    String?
+  post      Post?        @relation(fields: [postId], references: [id], onDelete: Cascade)
+  commentId String?
+  comment   Comment?     @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  createdAt DateTime     @default(now())
+
+  @@unique([userId, postId])    // Ensures one reaction per user per post
+  @@unique([userId, commentId]) // Ensures one reaction per user per comment
+}
+
+// 5. Threaded Comment Model
+model Comment {
+  id        String        @id @default(uuid())
+  content   String        @db.Text
+  status    CommentStatus @default(APPROVED)
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  
+  userId    String
+  // user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  postId    String
+  post      Post          @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  // Self-relation for nested replies (parent-child relationship)
+  parentId  String?
+  parent    Comment?      @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies   Comment[]     @relation("CommentReplies")
+
+  // Relations
+  reactions Reaction[]
+
+  @@index([postId, createdAt ])
+}
