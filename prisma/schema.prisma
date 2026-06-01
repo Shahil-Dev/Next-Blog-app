@@ -11,6 +11,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 // User Roles Enum
+
 enum Role {
   USER
   MODERATOR
@@ -19,6 +20,7 @@ enum Role {
 }
 
 // Friend Request Status Enum
+
 enum RequestStatus {
   PENDING
   ACCEPTED
@@ -26,6 +28,7 @@ enum RequestStatus {
 }
 
 // Multi-Reaction Enum
+
 enum ReactionType {
   LOVE
   HAHA
@@ -34,6 +37,7 @@ enum ReactionType {
 }
 
 // Comment Status Enum
+
 enum CommentStatus {
   APPROVED
   FLAGGED
@@ -41,14 +45,15 @@ enum CommentStatus {
 }
 
 model User {
-  id            String   @id @default(uuid())
-  name          String
-  email         String   @unique
-  emailVerified Boolean  @default(false)
-  image         String?
-  role          Role     @default(USER)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id               String          @id @default(uuid())
+  name             String
+  email            String          @unique
+  emailVerified    Boolean         @default(false)
+  image            String?
+  phone            String?        @unique
+  role             Role            @default(USER)
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
 
   // Relations
   sessions         Session[]
@@ -111,6 +116,7 @@ model Verification {
 }
 
 // 2. Friend Request Model 
+
 model FriendRequest {
   id         String        @id @default(uuid())
   senderId   String
@@ -127,6 +133,7 @@ model FriendRequest {
 }
 
 // 3. Post Model
+
 model Post {
   id         String   @id @default(uuid())
   title      String   @db.VarChar(255)
@@ -147,6 +154,7 @@ model Post {
 }
 
 // 4. Advanced Reactions Model
+
 model Reaction {
   id        String       @id @default(uuid())
   type      ReactionType
@@ -164,6 +172,7 @@ model Reaction {
 }
 
 // 5. Threaded Comment Model
+
 model Comment {
   id        String        @id @default(uuid())
   content   String        @db.Text
