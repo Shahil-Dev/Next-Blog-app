@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { PostService } from "./post.service";
+import { boolean } from "better-auth";
 
 const createPost = async (req: Request, res: Response) => {
   try {
@@ -18,7 +19,12 @@ const getAllPosts = async (req: Request, res: Response) => {
   try {
     const { search } = req.query;
     const searchString = typeof search === "string" ? search : undefined;
-    const result = await PostService.getAllPosts({ search: searchString });
+    const tags = req.query.tags ? (req.query.tags as string).split(",") : [];
+
+    const result = await PostService.getAllPosts({
+      search: searchString,tags
+    });
+
     res.status(200).json(result);
   } catch (error) {
     res.status(500).json({ error: "Failed to get posts" });
