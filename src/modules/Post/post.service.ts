@@ -19,10 +19,12 @@ const getAllPosts = async ({
   search,
   tags,
   isFeatured,
+  authorId,
 }: {
   search: string | undefined;
   tags: string[] | [];
-  isFeatured: boolean  | undefined;
+  isFeatured: boolean | undefined;
+  authorId: string | undefined;
 }) => {
   const andConditions: PostWhereInput[] = [];
   if (search) {
@@ -55,11 +57,13 @@ const getAllPosts = async ({
     });
   }
 
-   if (typeof isFeatured ==='boolean') {
-    andConditions.push({  isFeatured: isFeatured });  
-   }
+  if (typeof isFeatured === "boolean") {
+    andConditions.push({ isFeatured: isFeatured });
+  }
 
-
+  if (authorId) {
+    andConditions.push({ authorId: authorId as string });
+  }
 
   const result = await prisma.post.findMany({
     where: {
