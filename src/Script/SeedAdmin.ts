@@ -5,11 +5,12 @@ async function SeedAdmin() {
   try {
     console.log("Admin seeding started");
     const adminData = {
-      name: "Yemtehan Shahil12",
-      email: "yemtehanShahil1280@gmail.com",
+      name: "Tanim",
+      email: "tanim123@gmail.com",
       role: Role.ADMIN,
       password: "Shahil 12345678",
     };
+
     console.log("Checking user existing or not");
     const ExistingUser = await prisma.user.findUnique({
       where: {
@@ -17,23 +18,33 @@ async function SeedAdmin() {
       },
     });
 
+
     if (ExistingUser) {
-      console.log("Admin user already exists.");
+      console.log("Admin user already exists. Stopping seed.");
+      return; 
     }
 
+ 
+    console.log("Sending sign-up request to API...");
     const signUpAdmin = await fetch(
       "http://localhost:3000/api/auth/sign-up/email",
       {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Origin": "http://localhost:3000",
+          "Referer": "http://localhost:3000/"
         },
         body: JSON.stringify(adminData),
       },
     );
 
     if (signUpAdmin.ok) {
-      console.log("Admin created");
+      console.log("Admin created via API");
+      
+    
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
       await prisma.user.update({
         where: {
           email: adminData.email,
@@ -42,14 +53,18 @@ async function SeedAdmin() {
           emailVerified: true,
         },
       });
+      console.log("Email verification updated successfully.");
     } else {
-      console.error("Failed to create admin user.");
-
-      console.log("email verification updated");
+      const errorText = await signUpAdmin.text();
+      console.error("Failed to create admin user via API. Response:", errorText);
     }
-    console.log("Success!!!!")
+    
+    console.log("Success!!!!");
   } catch (error) {
-    console.error(error);
+    console.error("An error occurred during seeding:", error);
+  } finally {
+
+    await prisma.$disconnect();
   }
 }
 
