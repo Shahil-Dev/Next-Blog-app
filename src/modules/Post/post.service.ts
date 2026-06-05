@@ -22,8 +22,8 @@ const getAllPosts = async ({
   page,
   limit,
   skip,
-  SortBy , 
-  SortOrder   
+  SortBy,
+  SortOrder,
 }: {
   search: string | undefined;
   tags: string[] | [];
@@ -32,7 +32,7 @@ const getAllPosts = async ({
   page: number;
   limit: number;
   skip: number;
-  SortBy: string;       
+  SortBy: string;
   SortOrder: string;
 }) => {
   const andConditions: Prisma.PostWhereInput[] = [];
@@ -87,7 +87,21 @@ const getAllPosts = async ({
     } as Prisma.PostOrderByWithRelationInput,
   });
 
-  return result;
+  const count = await prisma.post.count({
+    where: {
+      AND: andConditions,
+    },
+  });
+
+  return {
+    data: result,
+    pagination: {
+      count,
+      page,
+      limit,
+      totalPageLimit: Math.ceil(count / limit),
+    },
+  };
 };
 
 export const PostService = {

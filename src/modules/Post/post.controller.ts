@@ -31,7 +31,7 @@ const getAllPosts = async (req: Request, res: Response) => {
       : undefined;
 
 
-    //authorId query param can be a string or undefined
+   
     const authorId = req.query.authorId as string | undefined;
 
     const { page, limit, skip, SortBy, SortOrder } = PaginationAndSortingHelper(
