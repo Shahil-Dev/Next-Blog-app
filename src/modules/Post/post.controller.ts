@@ -30,8 +30,6 @@ const getAllPosts = async (req: Request, res: Response) => {
           : undefined
       : undefined;
 
-
-   
     const authorId = req.query.authorId as string | undefined;
 
     const { page, limit, skip, SortBy, SortOrder } = PaginationAndSortingHelper(
@@ -55,7 +53,22 @@ const getAllPosts = async (req: Request, res: Response) => {
   }
 };
 
+const getPostById = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  console.log(id);
+  if (!id) {
+    throw new Error("Post id required");
+  }
+  try {
+    const result = await PostService.geAllPostByID(id as string);
+    res.status(201).json(result);
+  } catch (error) {
+    res.status(400).json({ error: "Failed to get posts" });
+  }
+};
+
 export const PostController = {
   createPost,
   getAllPosts,
+  getPostById,
 };
