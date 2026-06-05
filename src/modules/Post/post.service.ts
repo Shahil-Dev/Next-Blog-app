@@ -1,9 +1,8 @@
-import { Post } from "../../../generated/prisma/client";
-import { PostWhereInput } from "../../../generated/prisma/models";
+import { Prisma, Post } from "../../../generated/prisma/client";
 import { prisma } from "../../lib/prisma";
 
 const createPost = async (
-  data: Omit<Post, "id" | "authorId" | "createdAt" | "updated">,
+  data: Omit<Post, "id" | "authorId" | "createdAt" | "updatedAt">,
   userId: string,
 ) => {
   const result = await prisma.post.create({
@@ -23,8 +22,8 @@ const getAllPosts = async ({
   page,
   limit,
   skip,
-  SortBy,
-  SortOrder
+  SortBy , 
+  SortOrder   
 }: {
   search: string | undefined;
   tags: string[] | [];
@@ -33,36 +32,37 @@ const getAllPosts = async ({
   page: number;
   limit: number;
   skip: number;
-  SortBy?: string | undefined;
-  SortOrder?: string | undefined;
+  SortBy: string;       
+  SortOrder: string;
 }) => {
-  const andConditions: PostWhereInput[] = [];
+  const andConditions: Prisma.PostWhereInput[] = [];
+
   if (search) {
     andConditions.push({
       OR: [
         {
           title: {
-            contains: search as string,
+            contains: search,
             mode: "insensitive",
           },
         },
         {
           content: {
-            contains: search as string,
+            contains: search,
             mode: "insensitive",
           },
         },
         {
-          tags: { has: search as string },
+          tags: { has: search },
         },
       ],
     });
   }
 
-  if (tags.length > 0) {
+  if (tags && tags.length > 0) {
     andConditions.push({
       tags: {
-        hasEvery: tags as string[],
+        hasEvery: tags,
       },
     });
   }
@@ -72,25 +72,25 @@ const getAllPosts = async ({
   }
 
   if (authorId) {
-    andConditions.push({ authorId: authorId as string });
+    andConditions.push({ authorId: authorId });
   }
-   
+
+  const whereConditions: Prisma.PostWhereInput =
+    andConditions.length > 0 ? { AND: andConditions } : {};
+
   const result = await prisma.post.findMany({
     take: limit,
     skip,
-    where: {
-      AND: andConditions,
-    },
+    where: whereConditions,
     orderBy: {
-      [SortBy || "createdAt"]: SortOrder === "asc" ? "asc" : "desc",
-    }
+      [SortBy]: SortOrder,
+    } as Prisma.PostOrderByWithRelationInput,
   });
 
   return result;
 };
 
 export const PostService = {
-  // Add service methods here
   createPost,
   getAllPosts,
 };

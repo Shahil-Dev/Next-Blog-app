@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { PostService } from "./post.service";
-import { boolean } from "better-auth";
+import PaginationAndSortingHelper from "../../Helpers/PaginationAndSortingHelper";
 
 const createPost = async (req: Request, res: Response) => {
   try {
@@ -30,16 +30,13 @@ const getAllPosts = async (req: Request, res: Response) => {
           : undefined
       : undefined;
 
-    console.log({ isFeatured });
 
     //authorId query param can be a string or undefined
     const authorId = req.query.authorId as string | undefined;
 
-    const page = Number(req.query.page) ?? 1;
-    const limit = Number(req.query.limit) ?? 10;
-    const skip = (page - 1) * limit;
-    const SortBy = req.query.sortBy as string | undefined;
-    const SortOrder = req.query.sortOrder as string | undefined;
+    const { page, limit, skip, SortBy, SortOrder } = PaginationAndSortingHelper(
+      req.query,
+    );
     const result = await PostService.getAllPosts({
       search: searchString,
       tags,
@@ -49,7 +46,7 @@ const getAllPosts = async (req: Request, res: Response) => {
       limit,
       skip,
       SortBy,
-      SortOrder
+      SortOrder,
     });
 
     res.status(200).json(result);
