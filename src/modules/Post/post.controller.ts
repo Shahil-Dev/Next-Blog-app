@@ -35,6 +35,8 @@ const getAllPosts = async (req: Request, res: Response) => {
     const { page, limit, skip, SortBy, SortOrder } = PaginationAndSortingHelper(
       req.query,
     );
+    console.log(req.query);
+    console.log(PaginationAndSortingHelper(req.query));
     const result = await PostService.getAllPosts({
       search: searchString,
       tags,
@@ -49,7 +51,13 @@ const getAllPosts = async (req: Request, res: Response) => {
 
     res.status(200).json(result);
   } catch (error) {
-    res.status(500).json({ error: "Failed to get posts" });
+    console.error(error);
+
+    res.status(500).json({
+      success: false,
+      message: "Failed to get posts",
+      error,
+    });
   }
 };
 
