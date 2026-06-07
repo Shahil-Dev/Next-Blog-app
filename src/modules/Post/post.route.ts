@@ -6,6 +6,12 @@ const router = Router();
 
 router.get("/", PostController.getAllPosts);
 router.get("/:id", PostController.getPostById);
-router.post("/", authMiddleware(UserRole.USER), PostController.createPost);
+
+
+router.post(
+  "/", 
+  authMiddleware(UserRole.USER, UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.MODERATOR), 
+  PostController.createPost
+);
 
 export const PostRoutes = router;
