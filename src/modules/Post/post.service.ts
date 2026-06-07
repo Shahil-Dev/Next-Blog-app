@@ -1,4 +1,4 @@
-import { Prisma, Post } from "../../../generated/prisma/client";
+import { Prisma, Post, CommentStatus } from "../../../generated/prisma/client";
 import { prisma } from "../../lib/prisma";
 
 const createPost = async (
@@ -84,7 +84,14 @@ const getAllPosts = async ({
     where: whereConditions,
     orderBy: {
       [SortBy]: SortOrder,
-    } as Prisma.PostOrderByWithRelationInput,
+    }, //  as Prisma.PostOrderByWithRelationInput,
+    include: {
+      _count: {
+        select: { comments: true },
+      
+        
+      },
+    },
   });
 
   const count = await prisma.post.count({
@@ -109,15 +116,22 @@ const geAllPostByID = async (id: string) => {
     where: {
       id: id,
     },
+
     include: {
       comments: {
         where: {
           parentId: null,
+          status: CommentStatus.APPROVED,
         },
-
+        orderBy: { createdAt: "desc" },
         include: {
-           replies: true
+          replies: {
+            where: { status: CommentStatus.APPROVED },
           },
+        },
+      },
+      _count: {
+        select: { comments: true },
       },
     },
   });
