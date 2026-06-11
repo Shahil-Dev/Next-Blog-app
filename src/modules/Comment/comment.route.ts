@@ -15,6 +15,17 @@ router.get(
   CommentController.getCommentById,
 );
 
+router.delete(
+  "/:commentId",
+  authMiddleware(
+    UserRole.ADMIN,
+    UserRole.MODERATOR,
+    UserRole.SUPER_ADMIN,
+    UserRole.USER,
+  ),
+  CommentController.deletedComment,
+);
+
 router.post(
   "/",
   authMiddleware(

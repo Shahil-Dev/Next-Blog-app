@@ -30,18 +30,41 @@ const getCommentById = async (commentId: string) => {
     where: {
       id: commentId,
     },
-    include:{
-      post:{
-        select:{
-          id:true,
-          title:true
-        }
-      }
-    }
+    include: {
+      post: {
+        select: {
+          id: true,
+          title: true,
+        },
+      },
+    },
+  });
+};
+
+const deletedComment = async (commentId: string, userId: string) => {
+  const commentData = await prisma.comment.findFirst({
+    where: {
+      id: commentId,
+      userId,
+    },
+    select: {
+      id: true,
+    },
+  });
+
+  if (!commentData) {
+    throw new Error("Invalid");
+  }
+
+  return await prisma.comment.delete({
+    where: {
+      id: commentData.id,
+    },
   });
 };
 
 export const CommentService = {
   createComment,
   getCommentById,
+  deletedComment,
 };

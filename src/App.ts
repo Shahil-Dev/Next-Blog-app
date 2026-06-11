@@ -4,6 +4,7 @@ import { toNodeHandler } from "better-auth/node";
 import { auth } from "./lib/auth";
 import cors from "cors";
 import { CommentRoutes } from "./modules/Comment/comment.route";
+import { ReactionRoutes } from "./modules/Reaction/reaction.route";
 const app = express();
 
 app.all("/api/auth/*splat", toNodeHandler(auth));
@@ -18,6 +19,7 @@ app.use(express.json());
 
 app.use("/posts", PostRoutes);
 app.use("/comments", CommentRoutes)
+app.use("/reacts", ReactionRoutes)
 
 
 

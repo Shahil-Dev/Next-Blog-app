@@ -12,19 +12,29 @@ const createComment = async (req: Request, res: Response) => {
   }
 };
 
-const getCommentById = async (req:Request,res:Response)=>{
-   try {
-    const {commentId} = req.params;
+const getCommentById = async (req: Request, res: Response) => {
+  try {
+    const { commentId } = req.params;
     const result = await CommentService.getCommentById(commentId as string);
     res.status(200).json(result);
   } catch (error) {
     res.status(500).json({ error: "Failed to fetch Comment" });
   }
-}
+};
 
-
+const deletedComment = async (req: Request, res: Response) => {
+  try {
+    const user =req.user
+    const { commentId } = req.params;
+    const result = await CommentService.deletedComment(commentId as string,user?.id as string);
+    res.status(200).json(result);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to deleted Comment" });
+  }
+};
 
 export const CommentController = {
   createComment,
-  getCommentById
+  getCommentById,
+  deletedComment,
 };
