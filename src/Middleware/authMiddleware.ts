@@ -24,7 +24,7 @@ declare global {
 
 const authMiddleware = (...role: UserRole[]) => {
   return async (req: Request, res: Response, next: NextFunction) => {
-    console.log(req.headers)
+   
     const session = await auth.api.getSession({ headers: req.headers as any });
     if (!session || !session.user) {
       return res.status(401).json({ message: "You are not authorized" });

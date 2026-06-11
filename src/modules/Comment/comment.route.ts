@@ -25,6 +25,11 @@ router.delete(
   ),
   CommentController.deletedComment,
 );
+router.patch(
+  "/:commentId",
+  authMiddleware(UserRole.USER),
+  CommentController.updateComment,
+);
 
 router.post(
   "/",

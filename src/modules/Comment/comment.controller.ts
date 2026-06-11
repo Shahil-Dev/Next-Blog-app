@@ -22,11 +22,42 @@ const getCommentById = async (req: Request, res: Response) => {
   }
 };
 
+const updateComment = async (req: Request, res: Response) => {
+  try {
+    const user = req.user;
+    const { commentId } = req.params;
+
+   
+    // console.log("Updating Comment:", { commentId, userId: user?.id, body: req.body });
+
+    if (!user || !user.id) {
+      return res.status(401).json({ error: "Unauthorized. Please log in." });
+    }
+
+    const result = await CommentService.updateComment(
+      commentId as string,
+      req.body,
+      user.id as string,
+    );
+    
+    res.status(200).json(result);
+  } catch (error) {
+    console.error("Error in updateComment controller:", error);
+
+  
+    const errorMessage = error instanceof Error ? error.message : "Failed to update comment";
+    res.status(400).json({ error: errorMessage });
+  }
+};
+
 const deletedComment = async (req: Request, res: Response) => {
   try {
-    const user =req.user
+    const user = req.user;
     const { commentId } = req.params;
-    const result = await CommentService.deletedComment(commentId as string,user?.id as string);
+    const result = await CommentService.deletedComment(
+      commentId as string,
+      user?.id as string,
+    );
     res.status(200).json(result);
   } catch (error) {
     res.status(500).json({ error: "Failed to deleted Comment" });
@@ -37,4 +68,5 @@ export const CommentController = {
   createComment,
   getCommentById,
   deletedComment,
+  updateComment,
 };
