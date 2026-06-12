@@ -74,6 +74,37 @@ const getPostById = async (req: Request, res: Response) => {
   }
 };
 
+
+const updatePost = async (req: Request, res: Response) => {
+  try {
+    const user = req.user;
+    const { postId } = req.params;
+
+   
+    // console.log("Updating Comment:", { commentId, userId: user?.id, body: req.body });
+
+    if (!user || !user.id) {
+      return res.status(401).json({ error: "Unauthorized. Please log in." });
+    }
+
+    const result = await PostService.updatePost(
+     postId as string,
+      req.body,
+      user.id as string,
+    );
+    
+    res.status(200).json(result);
+  } catch (error) {
+    console.error("Error in update post controller:", error);
+
+  
+    const errorMessage = error instanceof Error ? error.message : "Failed to update post";
+    res.status(400).json({ error: errorMessage });
+  }
+};
+
+
+
 const deletedPost = async (req: Request, res: Response) => {
   try {
     const user = req.user;
@@ -95,5 +126,6 @@ export const PostController = {
   createPost,
   getAllPosts,
   getPostById,
+  updatePost,
   deletedPost,
 };

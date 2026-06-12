@@ -136,6 +136,35 @@ const geAllPostByID = async (id: string) => {
   return result;
 };
 
+const updatePost = async (
+  postId: string,
+  data: { title?: string; content?: string; tags: string[] },
+  authorId: string,
+) => {
+  const postData = await prisma.post.findFirst({
+    where: {
+      id: postId,
+       authorId
+    },
+    select: {
+      id: true,
+    },
+  });
+
+  if (!postData) {
+    throw new Error(
+      "Post not found or you are not authorized to update this comment",
+    );
+  }
+
+  return await prisma.post.update({
+    where: {
+      id: postId,
+    },
+    data,
+  });
+};
+
 const deletedPost = async (postId: string, userId: string) => {
   const postData = await prisma.post.findFirst({
     where: {
@@ -164,5 +193,6 @@ export const PostService = {
   createPost,
   getAllPosts,
   geAllPostByID,
+  updatePost,
   deletedPost,
 };
