@@ -14,4 +14,6 @@ router.post(
   PostController.createPost
 );
 
+router.delete("/:postId",authMiddleware(UserRole.USER,UserRole.ADMIN),PostController.deletedPost)
+
 export const PostRoutes = router;

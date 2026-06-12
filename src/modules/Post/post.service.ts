@@ -88,8 +88,6 @@ const getAllPosts = async ({
     include: {
       _count: {
         select: { comments: true },
-      
-        
       },
     },
   });
@@ -138,8 +136,33 @@ const geAllPostByID = async (id: string) => {
   return result;
 };
 
+const deletedPost = async (postId: string, userId: string) => {
+  const postData = await prisma.post.findFirst({
+    where: {
+      id: postId,
+      authorId: userId,
+    },
+    select: {
+      id: true,
+    },
+  });
+
+  if (!postData) {
+    throw new Error(
+      "Post not found or you are not authorized to delete this post",
+    );
+  }
+
+  return await prisma.post.delete({
+    where: {
+      id: postData.id,
+    },
+  });
+};
+
 export const PostService = {
   createPost,
   getAllPosts,
   geAllPostByID,
+  deletedPost,
 };

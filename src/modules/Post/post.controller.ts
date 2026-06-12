@@ -74,8 +74,26 @@ const getPostById = async (req: Request, res: Response) => {
   }
 };
 
+const deletedPost = async (req: Request, res: Response) => {
+  try {
+    const user = req.user;
+    const { postId } = req.params;
+    const result = await PostService.deletedPost(
+      postId as string,
+      user?.id as string,
+    );
+    res.status(200).json(result);
+  } catch (error: any) {
+  res.status(500).json({ 
+    error: "Failed to delete Post", 
+    message: error.message
+  });
+}
+};
+
 export const PostController = {
   createPost,
   getAllPosts,
   getPostById,
+  deletedPost,
 };
