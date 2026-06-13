@@ -104,7 +104,14 @@ const moderatedComment = async (
     where: {
       id,
     },
+    select: {
+      id: true,
+      status: true,
+    },
   });
+  if (commentData.status === data.status) {
+    throw new Error(`Your provided status ${data.status} up to data`);
+  }
 
   return prisma.comment.update({
     where: {
