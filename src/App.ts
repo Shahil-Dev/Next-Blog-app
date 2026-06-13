@@ -5,7 +5,7 @@ import { auth } from "./lib/auth";
 import cors from "cors";
 import { CommentRoutes } from "./modules/Comment/comment.route";
 import { ReactionRoutes } from "./modules/Reaction/reaction.route";
-import { FriendRequestRoutes } from "./modules/FriendRequest/friendRequest.route";
+// import { FriendRequestRoutes } from "./modules/FriendRequest/friendRequest.route";
 const app = express();
 
 app.all("/api/auth/*splat", toNodeHandler(auth));
@@ -21,7 +21,7 @@ app.use(express.json());
 app.use("/posts", PostRoutes);
 app.use("/comments", CommentRoutes);
 app.use("/reacts", ReactionRoutes);
-app.use("/friends", FriendRequestRoutes);
+// app.use("/friends", FriendRequestRoutes);
 
 app.get("/", (req, res) => {
   res.send("Hello, World!");

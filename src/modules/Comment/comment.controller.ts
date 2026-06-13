@@ -63,10 +63,27 @@ const deletedComment = async (req: Request, res: Response) => {
     res.status(500).json({ error: "Failed to deleted Comment" });
   }
 };
+const moderatedComment = async (req: Request, res: Response) => {
+  try {
+    // const user = req.user;
+    const { commentId } = req.params;
+    const result = await CommentService.moderatedComment(
+      commentId as string,
+       req.body
+    );
+    res.status(200).json(result);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to moderated Comment" });
+  }
+};
+
+
+
 
 export const CommentController = {
   createComment,
   getCommentById,
   deletedComment,
   updateComment,
+  moderatedComment
 };

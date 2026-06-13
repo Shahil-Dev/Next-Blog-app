@@ -1,5 +1,6 @@
 import { CommentStatus } from "../../../generated/prisma/enums";
 import { prisma } from "../../lib/prisma";
+// import { CommentStatus } from "./../../../generated/prisma/enums";
 
 const createComment = async (payload: {
   content: string;
@@ -42,8 +43,6 @@ const getCommentById = async (commentId: string) => {
   });
 };
 
-
-
 const deletedComment = async (commentId: string, userId: string) => {
   const commentData = await prisma.comment.findFirst({
     where: {
@@ -55,9 +54,10 @@ const deletedComment = async (commentId: string, userId: string) => {
     },
   });
 
-
   if (!commentData) {
-    throw new Error("Comment not found or you are not authorized to delete this comment");
+    throw new Error(
+      "Comment not found or you are not authorized to delete this comment",
+    );
   }
 
   return await prisma.comment.delete({
@@ -82,23 +82,42 @@ const updateComment = async (
     },
   });
 
- 
   if (!commentData) {
-    throw new Error("Comment not found or you are not authorized to update this comment");
+    throw new Error(
+      "Comment not found or you are not authorized to update this comment",
+    );
   }
 
   return await prisma.comment.update({
     where: {
-      id: commentId, 
+      id: commentId,
     },
     data,
   });
 };
 
+const moderatedComment = async (
+  id: string,
+  data: { status: CommentStatus },
+) => {
+  const commentData = await prisma.comment.findUniqueOrThrow({
+    where: {
+      id,
+    },
+  });
+
+  return prisma.comment.update({
+    where: {
+      id,
+    },
+    data,
+  });
+};
 
 export const CommentService = {
   createComment,
   getCommentById,
   deletedComment,
   updateComment,
+  moderatedComment,
 };

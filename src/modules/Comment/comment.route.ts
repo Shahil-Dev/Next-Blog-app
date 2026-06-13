@@ -31,6 +31,12 @@ router.patch(
   CommentController.updateComment,
 );
 
+router.patch(
+  "/:commentId/moderated",
+  authMiddleware(UserRole.USER),
+  CommentController.moderatedComment,
+);
+
 router.post(
   "/",
   authMiddleware(
