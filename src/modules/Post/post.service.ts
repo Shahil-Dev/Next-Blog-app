@@ -144,7 +144,7 @@ const updatePost = async (
   const postData = await prisma.post.findFirst({
     where: {
       id: postId,
-       authorId
+      authorId,
     },
     select: {
       id: true,
@@ -189,10 +189,37 @@ const deletedPost = async (postId: string, userId: string) => {
   });
 };
 
+const getMyPost = async (authorId: string) => {
+  const result = await prisma.post.findMany({
+    where: {
+      authorId,
+    },
+    include: {
+      _count: {
+        select: {
+          comments: true,
+        },
+      },
+    },
+  });
+
+  const total = await prisma.post.count({
+    where: {
+      authorId,
+    },
+  });
+  return {
+    data: {
+      result,
+    },
+    total,
+  };
+};
 export const PostService = {
   createPost,
   getAllPosts,
   geAllPostByID,
   updatePost,
+  getMyPost,
   deletedPost,
 };

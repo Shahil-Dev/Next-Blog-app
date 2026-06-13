@@ -74,13 +74,11 @@ const getPostById = async (req: Request, res: Response) => {
   }
 };
 
-
 const updatePost = async (req: Request, res: Response) => {
   try {
     const user = req.user;
     const { postId } = req.params;
 
-   
     // console.log("Updating Comment:", { commentId, userId: user?.id, body: req.body });
 
     if (!user || !user.id) {
@@ -88,22 +86,20 @@ const updatePost = async (req: Request, res: Response) => {
     }
 
     const result = await PostService.updatePost(
-     postId as string,
+      postId as string,
       req.body,
       user.id as string,
     );
-    
+
     res.status(200).json(result);
   } catch (error) {
     console.error("Error in update post controller:", error);
 
-  
-    const errorMessage = error instanceof Error ? error.message : "Failed to update post";
+    const errorMessage =
+      error instanceof Error ? error.message : "Failed to update post";
     res.status(400).json({ error: errorMessage });
   }
 };
-
-
 
 const deletedPost = async (req: Request, res: Response) => {
   try {
@@ -115,11 +111,29 @@ const deletedPost = async (req: Request, res: Response) => {
     );
     res.status(200).json(result);
   } catch (error: any) {
-  res.status(500).json({ 
-    error: "Failed to delete Post", 
-    message: error.message
-  });
-}
+    res.status(500).json({
+      error: "Failed to delete Post",
+      message: error.message,
+    });
+  }
+};
+
+const getMyPost = async (req: Request, res: Response) => {
+  try {
+    const user = req.user;
+    console.log(user)
+    if (!user) {
+      throw new Error("You are Unauthorize!");
+    }
+    // const { postId } = req.params;
+    const result = await PostService.getMyPost(user.id);
+    res.status(200).json(result);
+  } catch (error: any) {
+    res.status(500).json({
+      error: "Post fetch Failed!",
+      message: error.message,
+    });
+  }
 };
 
 export const PostController = {
@@ -128,4 +142,5 @@ export const PostController = {
   getPostById,
   updatePost,
   deletedPost,
+  getMyPost
 };
