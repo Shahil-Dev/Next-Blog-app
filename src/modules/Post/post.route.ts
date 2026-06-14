@@ -6,9 +6,17 @@ const router = Router();
 
 router.get("/", PostController.getAllPosts);
 router.get(
+  "/getStats",
+  authMiddleware(UserRole.ADMIN, UserRole.SUPER_ADMIN),
+  PostController.getState,
+);
+router.get(
   "/my-post",
   authMiddleware(
     UserRole.USER,
+    UserRole.ADMIN,
+    UserRole.SUPER_ADMIN,
+    UserRole.MODERATOR,
   ),
   PostController.getMyPost,
 );
@@ -27,7 +35,7 @@ router.post(
 
 router.patch(
   "/:postId",
-  authMiddleware(UserRole.USER),
+  authMiddleware(UserRole.USER, UserRole.ADMIN),
   PostController.updatePost,
 );
 

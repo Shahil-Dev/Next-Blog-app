@@ -1,5 +1,6 @@
 import { Prisma, Post, CommentStatus } from "../../../generated/prisma/client";
 import { prisma } from "../../lib/prisma";
+import { CommentStatus } from "./../../../generated/prisma/enums";
 
 const createPost = async (
   data: Omit<Post, "id" | "authorId" | "createdAt" | "updatedAt">,
@@ -148,12 +149,16 @@ const updatePost = async (
     },
     select: {
       id: true,
+      authorId: true,
     },
   });
 
+  if (postData?.authorId !== authorId) {
+  }
+
   if (!postData) {
     throw new Error(
-      "Post not found or you are not authorized to update this comment",
+      "Post not found or you are not authorized to update this post",
     );
   }
 
@@ -165,16 +170,24 @@ const updatePost = async (
   });
 };
 
-const deletedPost = async (postId: string, userId: string) => {
-  const postData = await prisma.post.findFirst({
+const deletedPost = async (
+  postId: string,
+  userId: string,
+  isAdmin: boolean,
+) => {
+  const postData = await prisma.post.findFirstOrThrow({
     where: {
       id: postId,
-      authorId: userId,
     },
     select: {
       id: true,
+      authorId: true,
     },
   });
+
+  if (!isAdmin && postData?.authorId !== authorId) {
+    throw new Error("You are not owner or creator of the post ");
+  }
 
   if (!postData) {
     throw new Error(
@@ -215,6 +228,26 @@ const getMyPost = async (authorId: string) => {
     total,
   };
 };
+
+const getState = async () => {
+  return await prisma.$transaction(async (tx) => {
+    const [totalPost, totalComments, ApprovedComment] = await Promise.all([
+      await tx.post.count(),
+      await tx.comment.count(),
+      await tx.comment.count({
+        where: {
+          status: CommentStatus.APPROVED,
+        },
+      }),
+    ]);
+    return {
+      totalPost,
+      totalComments,
+      ApprovedComment,
+    };
+  });
+};
+
 export const PostService = {
   createPost,
   getAllPosts,
@@ -222,4 +255,5 @@ export const PostService = {
   updatePost,
   getMyPost,
   deletedPost,
+  getState,
 };

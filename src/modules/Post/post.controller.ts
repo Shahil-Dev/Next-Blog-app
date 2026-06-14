@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { PostService } from "./post.service";
 import PaginationAndSortingHelper from "../../Helpers/PaginationAndSortingHelper";
+import { UserRole } from "../../Middleware/authMiddleware";
 
 const createPost = async (req: Request, res: Response) => {
   try {
@@ -105,9 +106,11 @@ const deletedPost = async (req: Request, res: Response) => {
   try {
     const user = req.user;
     const { postId } = req.params;
+    const isAdmin = user?.role === UserRole.ADMIN;
     const result = await PostService.deletedPost(
       postId as string,
       user?.id as string,
+      isAdmin,
     );
     res.status(200).json(result);
   } catch (error: any) {
@@ -121,7 +124,7 @@ const deletedPost = async (req: Request, res: Response) => {
 const getMyPost = async (req: Request, res: Response) => {
   try {
     const user = req.user;
-    console.log(user)
+    console.log(user);
     if (!user) {
       throw new Error("You are Unauthorize!");
     }
@@ -136,11 +139,27 @@ const getMyPost = async (req: Request, res: Response) => {
   }
 };
 
+
+const getState = async (req: Request, res: Response) => {
+  try {
+  
+    const result = await PostService.getState();
+    res.status(200).json(result);
+  } catch (error: any) {
+    res.status(500).json({
+      error: "Failed to get states ",
+      message: error.message,
+    });
+  }
+};
+
+
 export const PostController = {
   createPost,
   getAllPosts,
   getPostById,
   updatePost,
   deletedPost,
-  getMyPost
+  getMyPost,
+  getState
 };
