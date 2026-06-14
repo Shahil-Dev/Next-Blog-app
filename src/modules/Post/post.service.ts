@@ -1,6 +1,6 @@
 import { Prisma, Post, CommentStatus } from "../../../generated/prisma/client";
 import { prisma } from "../../lib/prisma";
-import { CommentStatus } from "./../../../generated/prisma/enums";
+import { UserRole } from "../../Middleware/authMiddleware";
 
 const createPost = async (
   data: Omit<Post, "id" | "authorId" | "createdAt" | "updatedAt">,
@@ -231,7 +231,14 @@ const getMyPost = async (authorId: string) => {
 
 const getState = async () => {
   return await prisma.$transaction(async (tx) => {
-    const [totalPost, totalComments, ApprovedComment] = await Promise.all([
+    const [
+      totalPost,
+      totalComments,
+      ApprovedComment,
+      RejectedComment,
+      totalUser,
+      AdminCount,
+    ] = await Promise.all([
       await tx.post.count(),
       await tx.comment.count(),
       await tx.comment.count({
@@ -239,11 +246,25 @@ const getState = async () => {
           status: CommentStatus.APPROVED,
         },
       }),
+      await tx.comment.count({
+        where: {
+          status: CommentStatus.REJECTED,
+        },
+      }),
+      await tx.user.count(),
+      await tx.user.count({
+        where:{
+            role:UserRole.ADMIN
+        }
+      })
     ]);
     return {
       totalPost,
       totalComments,
       ApprovedComment,
+      RejectedComment,
+      totalUser,
+      AdminCount
     };
   });
 };
@@ -257,3 +278,6 @@ export const PostService = {
   deletedPost,
   getState,
 };
+
+
+ 
