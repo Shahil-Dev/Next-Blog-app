@@ -1,9 +1,9 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { PostService } from "./post.service";
 import PaginationAndSortingHelper from "../../Helpers/PaginationAndSortingHelper";
 import { UserRole } from "../../Middleware/authMiddleware";
 
-const createPost = async (req: Request, res: Response) => {
+const createPost = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const user = req.user;
     if (!user) {
@@ -12,7 +12,7 @@ const createPost = async (req: Request, res: Response) => {
     const result = await PostService.createPost(req.body, user.id as string);
     res.status(201).json(result);
   } catch (error) {
-    res.status(500).json({ error: "Failed to create post" });
+    next(error);
   }
 };
 
@@ -139,10 +139,8 @@ const getMyPost = async (req: Request, res: Response) => {
   }
 };
 
-
 const getState = async (req: Request, res: Response) => {
   try {
-  
     const result = await PostService.getState();
     res.status(200).json(result);
   } catch (error: any) {
@@ -153,7 +151,6 @@ const getState = async (req: Request, res: Response) => {
   }
 };
 
-
 export const PostController = {
   createPost,
   getAllPosts,
@@ -161,5 +158,5 @@ export const PostController = {
   updatePost,
   deletedPost,
   getMyPost,
-  getState
+  getState,
 };

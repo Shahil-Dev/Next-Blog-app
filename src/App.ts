@@ -5,6 +5,7 @@ import { auth } from "./lib/auth";
 import cors from "cors";
 import { CommentRoutes } from "./modules/Comment/comment.route";
 import { ReactionRoutes } from "./modules/Reaction/reaction.route";
+import globalErrorHandler from "./Middleware/globalErrorHandler";
 // import { FriendRequestRoutes } from "./modules/FriendRequest/friendRequest.route";
 const app = express();
 
@@ -26,5 +27,7 @@ app.use("/reacts", ReactionRoutes);
 app.get("/", (req, res) => {
   res.send("Hello, World!");
 });
-
+ 
+app.use(globalErrorHandler)
+ 
 export default app;
