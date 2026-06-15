@@ -41,31 +41,15 @@ const getAllPosts = async ({
   if (search) {
     andConditions.push({
       OR: [
-        {
-          title: {
-            contains: search,
-            mode: "insensitive",
-          },
-        },
-        {
-          content: {
-            contains: search,
-            mode: "insensitive",
-          },
-        },
-        {
-          tags: { has: search },
-        },
+        { title: { contains: search, mode: "insensitive" } },
+        { content: { contains: search, mode: "insensitive" } },
+        { tags: { has: search } },
       ],
     });
   }
 
   if (tags && tags.length > 0) {
-    andConditions.push({
-      tags: {
-        hasEvery: tags,
-      },
-    });
+    andConditions.push({ tags: { hasEvery: tags } });
   }
 
   if (typeof isFeatured === "boolean") {
@@ -83,21 +67,13 @@ const getAllPosts = async ({
     take: limit,
     skip,
     where: whereConditions,
-    orderBy: {
-      [SortBy]: SortOrder,
-    }, //  as Prisma.PostOrderByWithRelationInput,
+    orderBy: { [SortBy]: SortOrder },
     include: {
-      _count: {
-        select: { comments: true },
-      },
+      _count: { select: { comments: true } },
     },
   });
 
-  const count = await prisma.post.count({
-    where: {
-      AND: andConditions,
-    },
-  });
+  const count = await prisma.post.count({ where: whereConditions });
 
   return {
     data: result,
@@ -112,10 +88,7 @@ const getAllPosts = async ({
 
 const geAllPostByID = async (id: string) => {
   const result = await prisma.post.findUnique({
-    where: {
-      id: id,
-    },
-
+    where: { id },
     include: {
       comments: {
         where: {
@@ -129,43 +102,35 @@ const geAllPostByID = async (id: string) => {
           },
         },
       },
-      _count: {
-        select: { comments: true },
-      },
+      _count: { select: { comments: true } },
     },
   });
+
+  if (!result) {
+    throw new Error("Post not found with the provided ID");
+  }
   return result;
 };
 
 const updatePost = async (
   postId: string,
-  data: { title?: string; content?: string; tags: string[] },
+  data: { title?: string; content?: string; tags?: string[] },
   authorId: string,
 ) => {
-  const postData = await prisma.post.findFirst({
-    where: {
-      id: postId,
-      authorId,
-    },
-    select: {
-      id: true,
-      authorId: true,
-    },
+  const postData = await prisma.post.findUnique({
+    where: { id: postId },
   });
 
-  if (postData?.authorId !== authorId) {
+  if (!postData) {
+    throw new Error("Post not found");
   }
 
-  if (!postData) {
-    throw new Error(
-      "Post not found or you are not authorized to update this post",
-    );
+  if (postData.authorId !== authorId) {
+    throw new Error("You are not authorized to update this post");
   }
 
   return await prisma.post.update({
-    where: {
-      id: postId,
-    },
+    where: { id: postId },
     data,
   });
 };
@@ -175,56 +140,36 @@ const deletedPost = async (
   userId: string,
   isAdmin: boolean,
 ) => {
-  const postData = await prisma.post.findFirstOrThrow({
-    where: {
-      id: postId,
-    },
-    select: {
-      id: true,
-      authorId: true,
-    },
+  const postData = await prisma.post.findUnique({
+    where: { id: postId },
   });
 
-  if (!isAdmin && postData?.authorId !== authorId) {
-    throw new Error("You are not owner or creator of the post ");
+  if (!postData) {
+    throw new Error("Post not found");
   }
 
-  if (!postData) {
-    throw new Error(
-      "Post not found or you are not authorized to delete this post",
-    );
+  // Check if user is either Admin or the Owner of the post
+  if (!isAdmin && postData.authorId !== userId) {
+    throw new Error("You are not authorized to delete this post");
   }
 
   return await prisma.post.delete({
-    where: {
-      id: postData.id,
-    },
+    where: { id: postId },
   });
 };
 
 const getMyPost = async (authorId: string) => {
   const result = await prisma.post.findMany({
-    where: {
-      authorId,
-    },
+    where: { authorId },
     include: {
-      _count: {
-        select: {
-          comments: true,
-        },
-      },
+      _count: { select: { comments: true } },
     },
   });
 
-  const total = await prisma.post.count({
-    where: {
-      authorId,
-    },
-  });
+  const total = await prisma.post.count({ where: { authorId } });
+
   return {
-    data: {
-      result,
-    },
+    data: result,
     total,
   };
 };
@@ -239,32 +184,21 @@ const getState = async () => {
       totalUser,
       AdminCount,
     ] = await Promise.all([
-      await tx.post.count(),
-      await tx.comment.count(),
-      await tx.comment.count({
-        where: {
-          status: CommentStatus.APPROVED,
-        },
-      }),
-      await tx.comment.count({
-        where: {
-          status: CommentStatus.REJECTED,
-        },
-      }),
-      await tx.user.count(),
-      await tx.user.count({
-        where:{
-            role:UserRole.ADMIN
-        }
-      })
+      tx.post.count(),
+      tx.comment.count(),
+      tx.comment.count({ where: { status: CommentStatus.APPROVED } }),
+      tx.comment.count({ where: { status: CommentStatus.REJECTED } }),
+      tx.user.count(),
+      tx.user.count({ where: { role: UserRole.ADMIN } }),
     ]);
+
     return {
       totalPost,
       totalComments,
       ApprovedComment,
       RejectedComment,
       totalUser,
-      AdminCount
+      AdminCount,
     };
   });
 };
@@ -278,6 +212,3 @@ export const PostService = {
   deletedPost,
   getState,
 };
-
-
- 

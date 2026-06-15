@@ -7,10 +7,18 @@ const createPost = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const user = req.user;
     if (!user) {
-      return res.status(401).json({ message: "You are not authorized" });
+      return res
+        .status(401)
+        .json({ success: false, message: "Authentication required" });
     }
     const result = await PostService.createPost(req.body, user.id as string);
-    res.status(201).json(result);
+    res
+      .status(201)
+      .json({
+        success: true,
+        message: "Post created successfully",
+        data: result,
+      });
   } catch (error) {
     next(error);
   }
@@ -35,8 +43,7 @@ const getAllPosts = async (req: Request, res: Response) => {
     const { page, limit, skip, SortBy, SortOrder } = PaginationAndSortingHelper(
       req.query,
     );
-    console.log(req.query);
-    console.log(PaginationAndSortingHelper(req.query));
+
     const result = await PostService.getAllPosts({
       search: searchString,
       tags,
@@ -49,29 +56,34 @@ const getAllPosts = async (req: Request, res: Response) => {
       SortOrder,
     });
 
-    res.status(200).json(result);
-  } catch (error) {
-    console.error(error);
-
+    res
+      .status(200)
+      .json({
+        success: true,
+        message: "Posts fetched successfully",
+        ...result,
+      });
+  } catch (error: any) {
     res.status(500).json({
       success: false,
-      message: "Failed to get posts",
-      error,
+      message: "Failed to fetch posts",
+      error: error.message,
     });
   }
 };
 
 const getPostById = async (req: Request, res: Response) => {
-  const { id } = req.params;
-  console.log(id);
-  if (!id) {
-    throw new Error("Post id required");
-  }
   try {
+    const { id } = req.params;
+    if (!id) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Post ID is required" });
+    }
     const result = await PostService.geAllPostByID(id as string);
-    res.status(201).json(result);
-  } catch (error) {
-    res.status(400).json({ error: "Failed to get posts" });
+    res.status(200).json({ success: true, data: result });
+  } catch (error: any) {
+    res.status(404).json({ success: false, message: error.message });
   }
 };
 
@@ -80,10 +92,10 @@ const updatePost = async (req: Request, res: Response) => {
     const user = req.user;
     const { postId } = req.params;
 
-    // console.log("Updating Comment:", { commentId, userId: user?.id, body: req.body });
-
     if (!user || !user.id) {
-      return res.status(401).json({ error: "Unauthorized. Please log in." });
+      return res
+        .status(401)
+        .json({ success: false, message: "Unauthorized. Please log in." });
     }
 
     const result = await PostService.updatePost(
@@ -92,13 +104,15 @@ const updatePost = async (req: Request, res: Response) => {
       user.id as string,
     );
 
-    res.status(200).json(result);
-  } catch (error) {
-    console.error("Error in update post controller:", error);
-
-    const errorMessage =
-      error instanceof Error ? error.message : "Failed to update post";
-    res.status(400).json({ error: errorMessage });
+    res
+      .status(200)
+      .json({
+        success: true,
+        message: "Post updated successfully",
+        data: result,
+      });
+  } catch (error: any) {
+    res.status(400).json({ success: false, message: error.message });
   }
 };
 
@@ -106,17 +120,28 @@ const deletedPost = async (req: Request, res: Response) => {
   try {
     const user = req.user;
     const { postId } = req.params;
-    const isAdmin = user?.role === UserRole.ADMIN;
+
+    if (!user) {
+      return res.status(401).json({ success: false, message: "Unauthorized" });
+    }
+
+    const isAdmin = user.role === UserRole.ADMIN;
     const result = await PostService.deletedPost(
       postId as string,
-      user?.id as string,
+      user.id as string,
       isAdmin,
     );
-    res.status(200).json(result);
+    res
+      .status(200)
+      .json({
+        success: true,
+        message: "Post deleted successfully",
+        data: result,
+      });
   } catch (error: any) {
-    res.status(500).json({
-      error: "Failed to delete Post",
-      message: error.message,
+    res.status(403).json({
+      success: false,
+      message: error.message || "Failed to delete post",
     });
   }
 };
@@ -124,17 +149,24 @@ const deletedPost = async (req: Request, res: Response) => {
 const getMyPost = async (req: Request, res: Response) => {
   try {
     const user = req.user;
-    console.log(user);
     if (!user) {
-      throw new Error("You are Unauthorize!");
+      return res
+        .status(401)
+        .json({ success: false, message: "You are not authorized" });
     }
-    // const { postId } = req.params;
     const result = await PostService.getMyPost(user.id);
-    res.status(200).json(result);
+    res
+      .status(200)
+      .json({
+        success: true,
+        message: "Your posts fetched successfully",
+        ...result,
+      });
   } catch (error: any) {
     res.status(500).json({
-      error: "Post fetch Failed!",
-      message: error.message,
+      success: false,
+      message: "Failed to fetch your posts",
+      error: error.message,
     });
   }
 };
@@ -142,11 +174,12 @@ const getMyPost = async (req: Request, res: Response) => {
 const getState = async (req: Request, res: Response) => {
   try {
     const result = await PostService.getState();
-    res.status(200).json(result);
+    res.status(200).json({ success: true, data: result });
   } catch (error: any) {
     res.status(500).json({
-      error: "Failed to get states ",
-      message: error.message,
+      success: false,
+      message: "Failed to fetch dashboard statistics",
+      error: error.message,
     });
   }
 };

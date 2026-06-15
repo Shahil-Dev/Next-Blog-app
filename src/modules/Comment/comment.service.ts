@@ -1,6 +1,5 @@
 import { CommentStatus } from "../../../generated/prisma/enums";
 import { prisma } from "../../lib/prisma";
-// import { CommentStatus } from "./../../../generated/prisma/enums";
 
 const createComment = async (payload: {
   content: string;
@@ -8,18 +7,21 @@ const createComment = async (payload: {
   postId: string;
   parentId?: string;
 }) => {
-  await prisma.post.findUniqueOrThrow({
-    where: {
-      id: payload.postId,
-    },
+  const postExists = await prisma.post.findUnique({
+    where: { id: payload.postId },
   });
 
+  if (!postExists) {
+    throw new Error("Target post not found to comment on");
+  }
+
   if (payload.parentId) {
-    prisma.comment.findUnique({
-      where: {
-        id: payload.parentId,
-      },
+    const parentCommentExists = await prisma.comment.findUnique({
+      where: { id: payload.parentId },
     });
+    if (!parentCommentExists) {
+      throw new Error("Parent comment not found to reply on");
+    }
   }
 
   return await prisma.comment.create({
@@ -28,10 +30,8 @@ const createComment = async (payload: {
 };
 
 const getCommentById = async (commentId: string) => {
-  return await prisma.comment.findUnique({
-    where: {
-      id: commentId,
-    },
+  const comment = await prisma.comment.findUnique({
+    where: { id: commentId },
     include: {
       post: {
         select: {
@@ -41,29 +41,30 @@ const getCommentById = async (commentId: string) => {
       },
     },
   });
+
+  if (!comment) {
+    throw new Error("Comment not found with the provided ID");
+  }
+
+  return comment;
 };
 
 const deletedComment = async (commentId: string, userId: string) => {
-  const commentData = await prisma.comment.findFirst({
-    where: {
-      id: commentId,
-      userId,
-    },
-    select: {
-      id: true,
-    },
+  const commentData = await prisma.comment.findUnique({
+    where: { id: commentId },
+    select: { id: true, userId: true },
   });
 
   if (!commentData) {
-    throw new Error(
-      "Comment not found or you are not authorized to delete this comment",
-    );
+    throw new Error("Comment not found");
+  }
+
+  if (commentData.userId !== userId) {
+    throw new Error("You are not authorized to delete this comment");
   }
 
   return await prisma.comment.delete({
-    where: {
-      id: commentData.id,
-    },
+    where: { id: commentId },
   });
 };
 
@@ -72,26 +73,21 @@ const updateComment = async (
   data: { content?: string; status?: CommentStatus },
   userId: string,
 ) => {
-  const commentData = await prisma.comment.findFirst({
-    where: {
-      id: commentId,
-      userId,
-    },
-    select: {
-      id: true,
-    },
+  const commentData = await prisma.comment.findUnique({
+    where: { id: commentId },
+    select: { id: true, userId: true },
   });
 
   if (!commentData) {
-    throw new Error(
-      "Comment not found or you are not authorized to update this comment",
-    );
+    throw new Error("Comment not found");
+  }
+
+  if (commentData.userId !== userId) {
+    throw new Error("You are not authorized to update this comment");
   }
 
   return await prisma.comment.update({
-    where: {
-      id: commentId,
-    },
+    where: { id: commentId },
     data,
   });
 };
@@ -100,23 +96,21 @@ const moderatedComment = async (
   id: string,
   data: { status: CommentStatus },
 ) => {
-  const commentData = await prisma.comment.findUniqueOrThrow({
-    where: {
-      id,
-    },
-    select: {
-      id: true,
-      status: true,
-    },
+  const commentData = await prisma.comment.findUnique({
+    where: { id },
+    select: { id: true, status: true },
   });
+
+  if (!commentData) {
+    throw new Error("Comment not found for moderation");
+  }
+
   if (commentData.status === data.status) {
-    throw new Error(`Your provided status ${data.status} up to data`);
+    throw new Error(`Comment status is already ${data.status}`);
   }
 
   return prisma.comment.update({
-    where: {
-      id,
-    },
+    where: { id },
     data,
   });
 };
