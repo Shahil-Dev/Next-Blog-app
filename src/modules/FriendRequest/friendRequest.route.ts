@@ -1,6 +1,7 @@
 import express from "express";
-import { authMiddleware, UserRole } from "../../Middleware/authMiddleware";
-import { FriendRequestController } from "./friendRequest.controller";
+import { authMiddleware, UserRole } from "../../Middleware/authMiddleware.js";
+import { FriendRequestController } from "./friendRequest.controller.js";
+
 
 const router = express.Router();
 

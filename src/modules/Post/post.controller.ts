@@ -1,7 +1,8 @@
 import { NextFunction, Request, Response } from "express";
-import { PostService } from "./post.service";
-import PaginationAndSortingHelper from "../../Helpers/PaginationAndSortingHelper";
-import { UserRole } from "../../Middleware/authMiddleware";
+import { PostService } from "./post.service.js";
+import PaginationAndSortingHelper from "../../Helpers/PaginationAndSortingHelper.js";
+import { UserRole } from "../../Middleware/authMiddleware.js";
+
 
 const createPost = async (req: Request, res: Response, next: NextFunction) => {
   try {

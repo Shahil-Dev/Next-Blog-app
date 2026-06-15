@@ -1,13 +1,14 @@
 import express from "express";
 import cors from "cors";
 import { toNodeHandler } from "better-auth/node";
-import { auth } from "./lib/auth";
-import { PostRoutes } from "./modules/Post/post.route";
-import { CommentRoutes } from "./modules/Comment/comment.route";
-import { ReactionRoutes } from "./modules/Reaction/reaction.route";
-import { FriendRequestRoutes } from "./modules/FriendRequest/friendRequest.route";
-import globalErrorHandler from "./Middleware/globalErrorHandler";
-import { notFound } from "./Middleware/notFound";
+import { auth } from "./lib/auth.js";
+import { PostRoutes } from "./modules/Post/post.route.js";
+import { CommentRoutes } from "./modules/Comment/comment.route.js";
+import { ReactionRoutes } from "./modules/Reaction/reaction.route.js";
+import { FriendRequestRoutes } from "./modules/FriendRequest/friendRequest.route.js";
+import { notFound } from "./Middleware/notFound.js";
+import globalErrorHandler from "./Middleware/globalErrorHandler.js";
+
 
 const app = express();
 

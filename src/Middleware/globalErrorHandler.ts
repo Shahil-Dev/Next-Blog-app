@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { Prisma } from "../../generated/prisma/client";
+import { PrismaClientValidationError } from "@prisma/client/runtime/library.js"; 
 
 function globalErrorHandler(
   err: any,
@@ -11,9 +11,9 @@ function globalErrorHandler(
   let errorMessage = "Internal server Error";
   let errorDetails = err;
 
-  if (err instanceof Prisma.PrismaClientValidationError) {
+  if (err instanceof PrismaClientValidationError) {
     statusCode = 400;
-    errorMessage = "you provide incorrect fields";
+    errorMessage = "You provided incorrect fields";
   }
 
   res.status(statusCode);
@@ -24,3 +24,5 @@ function globalErrorHandler(
 }
 
 export default globalErrorHandler;
+
+
