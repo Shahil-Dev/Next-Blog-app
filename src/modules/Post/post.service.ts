@@ -1,4 +1,5 @@
-import { Prisma, Post, CommentStatus } from "../../../generated/prisma/client";
+// import { Prisma, Post, CommentStatus } from "../../../generated/prisma/client";
+import { CommentStatus, Post, Prisma } from "../../generated/prisma/client";
 import { prisma } from "../../lib/prisma";
 import { UserRole } from "../../Middleware/authMiddleware";
 
@@ -175,7 +176,7 @@ const getMyPost = async (authorId: string) => {
 };
 
 const getState = async () => {
-  return await prisma.$transaction(async (tx) => {
+  return await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
     const [
       totalPost,
       totalComments,

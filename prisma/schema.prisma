@@ -3,13 +3,14 @@
 
 generator client {
   provider = "prisma-client"
-  output   = "../generated/prisma"
+  output   = "../src/generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
 // User Roles Enum
 
 enum Role {
@@ -45,18 +46,17 @@ enum CommentStatus {
 }
 
 model User {
-  id               String          @id @default(uuid())
-  name             String
-  email            String          @unique
-  emailVerified    Boolean         @default(false)
-  image            String?
-  phone            String?         
-  status           String?         
-  role             Role            @default(USER)
-  createdAt        DateTime        @default(now())
-  updatedAt        DateTime        @updatedAt
+  id            String   @id @default(uuid())
+  name          String
+  email         String   @unique
+  emailVerified Boolean  @default(false)
+  image         String?
+  phone         String?
+  status        String?
+  role          Role     @default(USER)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
- 
   sessions         Session[]
   accounts         Account[]
   posts            Post[]
