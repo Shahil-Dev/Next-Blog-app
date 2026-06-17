@@ -5915,7 +5915,7 @@ var require_prisma = __commonJS({
         "isCustomOutput": true
       },
       "relativeEnvPaths": {
-        "rootEnvPath": "../../../.env",
+        "rootEnvPath": null,
         "schemaEnvPath": "../../../.env"
       },
       "relativePath": "../../../prisma",
@@ -6095,12 +6095,8 @@ var auth = betterAuth({
 // src/modules/Post/post.route.ts
 import { Router } from "express";
 
-// src/generated/prisma/enums.ts
-var CommentStatus = {
-  APPROVED: "APPROVED",
-  FLAGGED: "FLAGGED",
-  REJECTED: "REJECTED"
-};
+// src/modules/Post/post.service.ts
+var import_client2 = __toESM(require_client(), 1);
 
 // src/Middleware/authMiddleware.ts
 var authMiddleware = (...role) => {
@@ -6194,12 +6190,12 @@ var geAllPostByID = async (id) => {
       comments: {
         where: {
           parentId: null,
-          status: CommentStatus.APPROVED
+          status: import_client2.CommentStatus.APPROVED
         },
         orderBy: { createdAt: "desc" },
         include: {
           replies: {
-            where: { status: CommentStatus.APPROVED }
+            where: { status: import_client2.CommentStatus.APPROVED }
           }
         }
       },
@@ -6265,8 +6261,8 @@ var getState = async () => {
     ] = await Promise.all([
       tx.post.count(),
       tx.comment.count(),
-      tx.comment.count({ where: { status: CommentStatus.APPROVED } }),
-      tx.comment.count({ where: { status: CommentStatus.REJECTED } }),
+      tx.comment.count({ where: { status: import_client2.CommentStatus.APPROVED } }),
+      tx.comment.count({ where: { status: import_client2.CommentStatus.REJECTED } }),
       tx.user.count(),
       tx.user.count({ where: { role: "ADMIN" /* ADMIN */ } })
     ]);
