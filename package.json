@@ -7,9 +7,9 @@
   "author": "",
   "type": "module",
   "main": "dist/Server.js",
- "scripts": {
-  "build": "prisma generate && tsup src/Server.ts --format esm --clean",
-  "vercel-build": "npm install && prisma generate && tsup src/Server.ts --format esm --clean",
+"scripts": {
+  "build": "prisma generate && tsup src/Server.ts --format esm --clean --external prisma --external @prisma/client",
+  "vercel-build": "npm install && prisma generate && tsup src/Server.ts --format esm --clean --external prisma --external @prisma/client",
   "dev": "tsx watch src/Server.ts",
   "seed:admin": "tsx src/Script/SeedAdmin.ts"
 },
