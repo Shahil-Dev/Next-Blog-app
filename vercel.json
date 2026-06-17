@@ -5,7 +5,12 @@
       "src": "dist/Server.js",
       "use": "@vercel/node",
       "config": {
-        "includeFiles": ["src/generated/prisma/**/*"]
+        "includeFiles": [
+          "dist/**",
+          "src/generated/prisma/**",
+          "node_modules/.prisma/**",
+          "node_modules/@prisma/client/**"
+        ]
       }
     }
   ],
