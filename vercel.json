@@ -1,19 +1,12 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "dist/Server.js",
-      "use": "@vercel/node",
-      "config": {
-        "includeFiles": [
-          "dist/**",
-          "src/generated/prisma/**",
-          "node_modules/.prisma/**",
-          "node_modules/@prisma/client/**"
-        ]
-      }
+  "buildCommand": "npm run vercel-build",
+  "outputDirectory": "dist",
+  "functions": {
+    "dist/Server.js": {
+      "runtime": "nodejs20.x"
     }
-  ],
+  },
   "routes": [
     {
       "src": "/(.*)",
