@@ -2,16 +2,17 @@
   "compilerOptions": {
     "rootDir": "./src",
     "outDir": "./dist",
-    "module": "ESNext",
-    "moduleResolution": "bundler",
-    "target": "ES2022",
-    "lib": ["esnext"],
+    "module": "nodenext",
+   "moduleResolution": "nodenext",
+    "target": "esnext",
+    "types": [],
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
     "strict": true,
-    "noImplicitAny": true,
+    "noUncheckedSideEffectImports": true,
     "isolatedModules": true,
     "moduleDetection": "force",
-    "skipLibCheck": true,
-    "esModuleInterop": true
+    "skipLibCheck": true
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist", "src/generated/prisma"]

@@ -1,4 +1,5 @@
-import { CommentStatus } from "../../generated/prisma/enums";
+
+import { CommentStatus } from "../../generated/prisma";
 import { prisma } from "../../lib/prisma";
 
 const createComment = async (payload: {

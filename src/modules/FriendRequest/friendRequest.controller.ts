@@ -84,10 +84,33 @@ const unfriend = async (req: Request, res: Response) => {
   }
 };
 
+const getMyFriends = async (req: Request, res: Response) => {
+  try {
+    const result = await FriendRequestService.getMyFriends(req.user?.id as string);
+    res.status(200).json({ success: true, data: result });
+  } catch (error: any) {
+    res.status(400).json({ success: false, error: error.message });
+  }
+};
+
+const getPendingRequests = async (req: Request, res: Response) => {
+  try {
+    const result = await FriendRequestService.getPendingRequests(req.user?.id as string);
+    res.status(200).json({ success: true, data: result });
+  } catch (error: any) {
+    res.status(400).json({ success: false, error: error.message });
+  }
+};
+
+
+
+
 export const FriendRequestController = {
   sendRequest,
   acceptRequest,
   rejectRequest,
   cancelRequest,
   unfriend,
+   getMyFriends,
+  getPendingRequests
 };
