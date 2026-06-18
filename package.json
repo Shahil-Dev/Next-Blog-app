@@ -19,13 +19,14 @@
     "tsup": "^8.5.1",
     "typescript": "^6.0.3"
   },
-  "dependencies": {
+ "dependencies": {
     "@prisma/client": "^6.19.3",
     "better-auth": "^1.6.13",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "nodemailer": "^8.0.10",
-    "tsx": "^4.22.3"
+    "tsx": "^4.22.3",
+    "tsup": "^8.0.0"
   }
 }
