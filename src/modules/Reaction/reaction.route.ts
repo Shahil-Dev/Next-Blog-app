@@ -1,6 +1,6 @@
 import express from "express";
-import { authMiddleware, UserRole } from "../../Middleware/authMiddleware";
-import { ReactionController } from "./reaction.controller";
+import { authMiddleware, UserRole } from "../../Middleware/authMiddleware.js";
+import { ReactionController } from "./reaction.controller.js";
 
 const router = express.Router();
 

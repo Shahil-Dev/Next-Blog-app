@@ -1,6 +1,5 @@
-
-import { CommentStatus } from "../../generated/prisma";
-import { prisma } from "../../lib/prisma";
+import { CommentStatus } from "../../generated/prisma/index.js";
+import { prisma } from "../../lib/prisma.js";
 
 const createComment = async (payload: {
   content: string;

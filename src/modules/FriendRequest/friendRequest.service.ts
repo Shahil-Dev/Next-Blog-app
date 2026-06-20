@@ -1,4 +1,4 @@
-import { prisma } from "../../lib/prisma";
+import { prisma } from "../../lib/prisma.js";
 
 const sendFriendRequest = async (senderId: string, receiverId: string) => {
   if (senderId === receiverId) {

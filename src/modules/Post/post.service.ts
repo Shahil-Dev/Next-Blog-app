@@ -1,7 +1,6 @@
-// import { Prisma, Post, CommentStatus } from "../../../generated/prisma/client";
-import { CommentStatus, Post, Prisma } from "../../generated/prisma/client";
-import { prisma } from "../../lib/prisma";
-import { UserRole } from "../../Middleware/authMiddleware";
+import { CommentStatus, Post, Prisma } from "../../generated/prisma/client.js";
+import { prisma } from "../../lib/prisma.js";
+import { UserRole } from "../../Middleware/authMiddleware.js";
 
 const createPost = async (
   data: Omit<Post, "id" | "authorId" | "createdAt" | "updatedAt">,

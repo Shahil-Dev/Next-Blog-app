@@ -1,25 +1,14 @@
 {
   "name": "next-blog",
   "version": "1.0.0",
-  "main": "index.js",
+  "type": "module",
+  "main": "dist/Server.js",
   "scripts": {
-    "test": "echo \"Error:no test specified\" && exit 1",
-    "build":"tsc",
+    "build": "prisma generate && tsc && npm run copy-prisma",
+    "vercel-build": "prisma generate && tsc && npm run copy-prisma",
+    "copy-prisma": "node -e \"require('fs').cpSync('src/generated/prisma', 'dist/generated/prisma', {recursive: true})\"",
     "dev": "tsx watch src/Server.ts",
     "seed:admin": "tsx src/Script/SeedAdmin.ts"
-  },
-  "keywords": [],
-  "author": "",
-  "license":"ISC",
-   "dependencies": {
-    "@prisma/client": "^6.19.3",
-    "better-auth": "^1.6.13",
-    "cors": "^2.8.6",
-    "dotenv": "^17.4.2",
-    "express": "^5.2.1",
-    "nodemailer": "^8.0.10",
-    "tsx": "^4.22.3",
-    "tsup": "^8.0.0"
   },
   "devDependencies": {
     "@types/cors": "^2.8.19",
@@ -28,8 +17,15 @@
     "@types/nodemailer": "^8.0.0",
     "@types/pg": "^8.20.0",
     "prisma": "^6.19.3",
-    "tsup": "^8.5.1",
     "typescript": "^6.0.3"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.19.3",
+    "better-auth": "^1.6.13",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "nodemailer": "^8.0.10",
+    "tsx": "^4.22.3"
   }
- 
 }

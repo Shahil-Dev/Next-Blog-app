@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
-import { ReactionService } from "./reaction.service";
-
+import { ReactionService } from "./reaction.service.js";
 const createReaction = async (req: Request, res: Response) => {
   try {
     const user = req.user;

@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { FriendRequestService } from "./friendRequest.service";
+import { FriendRequestService } from "./friendRequest.service.js";
 
 const sendRequest = async (req: Request, res: Response) => {
   try {

@@ -1,19 +1,37 @@
+// {
+//   "compilerOptions": {
+//     "rootDir": "./src",
+//     "outDir": "./dist",
+//     "module": "nodenext",
+//    "moduleResolution": "nodenext",
+//     "target": "esnext",
+//     "types": [],
+//     "noUncheckedIndexedAccess": true,
+//     "exactOptionalPropertyTypes": true,
+//     "strict": true,
+//     "noUncheckedSideEffectImports": true,
+//     "isolatedModules": true,
+//     "moduleDetection": "force",
+//     "skipLibCheck": true
+//   },
+//   "include": ["src/**/*"],
+//   "exclude": ["node_modules", "dist", "src/generated/prisma"]
+// }
+
+
 {
   "compilerOptions": {
     "rootDir": "./src",
     "outDir": "./dist",
-    "module": "nodenext",
-   "moduleResolution": "nodenext",
-    "target": "esnext",
-    "types": [],
-    "noUncheckedIndexedAccess": true,
-    "exactOptionalPropertyTypes": true,
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "target": "ES2022",
+    "lib": ["esnext"],
     "strict": true,
-    "noUncheckedSideEffectImports": true,
-    "isolatedModules": true,
-    "moduleDetection": "force",
-    "skipLibCheck": true
+    "noImplicitAny": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist", "src/generated/prisma"]
+  "exclude": ["node_modules", "dist"]
 }
